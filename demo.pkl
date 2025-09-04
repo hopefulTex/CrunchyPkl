@@ -1,0 +1,93 @@
+amends "Config.pkl"
+
+config = new {
+	// $schema = "https://charm.land/crush.json"
+  lsp {
+    ["go"] {
+      command = "gopls"
+    }
+    ["demo"] {
+      args {"--fake" "--argument" "-f"}
+      command = "gopls"
+      enabled = false
+      env {
+        ["LANG_OPT"] = "nah"
+      }
+      filetypes {".txt" ".go" ".pkl"}
+      options {
+        key = "Value"
+        obj {
+          smallerKey = "DiffValue"
+        }
+      }
+    }
+  }
+  mcp {
+    ["filesystem"] {
+      type = "stdio"
+      command = "node"
+      args {"/path/to/mcp-server.js"}
+      env {
+        ["NODE_ENV"] = "production"
+      }
+      disabled = false
+      headers {
+        ["bearer"] = "guy scared of bears be like 😱"
+      }
+      timeout = 15
+      url = "http://localhost:3000/mcp"
+    }
+  }
+  providers {
+    ["ollama"] {
+      type = "openai"
+      base_url = "localhost:11434"
+      models {
+				new {
+					id = "phi4-mini-reasoning:3.8b"
+					name = "Phi 4 Mini Reasoning"
+					context_window = 128000
+					default_max_tokens = 5000
+					cost_per_1m_in = 0
+          cost_per_1m_out = 0
+          cost_per_1m_in_cached = 0
+          cost_per_1m_out_cached = 0
+          can_reason = false
+          has_reasoning_efforts = false
+          default_reasoning_effort = "medium"
+          supports_attachments = true
+				}
+      }
+		}
+  }
+  permissions {
+    allowed_tools {"gum"}
+  }
+  options {
+    context_paths {"./context/ctx.txt"}
+  data_directory = ""
+  debug = false
+  debug_lsp = false
+  disable_auto_summarize = false
+  tui {
+    compact_mode = false
+    diff_mode = "split"
+    }
+  }
+  models {
+  ["gpt-4o"] {
+    model = "gpt-4o"
+    max_tokens = 4096
+    provider = "openai"
+    reasoning_effort = "high"
+    think = false
+    }
+    ["gemma"] {
+      model = "gemma3:27b-it-qat"
+      max_tokens = 4096
+      provider = "lmstudio"
+      reasoning_effort = "medium"
+      think = false
+    }
+  }
+}

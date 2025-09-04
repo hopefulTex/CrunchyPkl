@@ -1,0 +1,180 @@
+module charm.crush.Config
+
+const JsonSchema: String = "https://charm.land/crush.json"
+
+config: Config
+
+output {
+  renderer = new JsonRenderer {}
+  value = config
+}
+
+class Config {
+  /// Loads JSON-Schema for the config file
+  $schema: String = JsonSchema
+
+  /// Language Server Protocol configurations.
+  lsp: Mapping<String, LSP>?
+
+  /// Model Context Protocol server configurations.
+  mcp: Mapping<String, MCP>?
+
+  /// Model configurations for different model types.
+  models: Mapping<String, ModelConfig>?
+
+  /// General application options.
+  options: Options?
+
+  /// AI provider configurations.
+  providers: Mapping<String, Provider>?
+
+  /// Permission settings for tool usage.
+  permissions: Permissions?
+}
+
+/// Language Server Protocol configurations.
+class LSP {
+  /// Arguments to pass to the LSP server command.
+  args: Listing<String>?
+
+  /// Command to execute for the LSP server.
+  command: String
+
+  /// Whether this LSP server is disabled.
+  enabled: Boolean? = false
+
+  /// Environment variables to set to the LSP server command.
+  env: Mapping<String, String>?
+
+  /// File types this LSP server handles.
+  filetypes: Listing<String>?
+
+  /// LSP server-specific configuration options.
+  options: Object?
+}
+
+/// Model Context Protocol server configurations.
+class MCP {
+  /// Type of MCP connection.
+  type: "stdio" | "sse" | "http"
+
+  /// Command to execute for stdio MCP servers.
+  command: String?
+
+  /// Arguments to pass to the MCP server command.
+  args: Listing<String>?
+
+  /// Environment variables to set for the MCP server.
+  env: Mapping<String, String>?
+
+  /// Whether this MCP server is disabled.
+  disabled: Boolean? = false
+
+  /// HTTP headers for HTTP/SSE MCP servers.
+  headers: Mapping<String, String>?
+
+  /// Timeout in seconds for MCP server connections.
+  timeout: Int? = 15
+ 
+  /// URL for HTTP or SSE MCP servers.
+  url: String?
+}
+
+class Model {
+  id: String
+  name: String
+  context_window: Int
+  default_max_tokens: Int
+  cost_per_1m_in: Int
+  cost_per_1m_out: Int
+  cost_per_1m_in_cached: Int
+  cost_per_1m_out_cached: Int
+  can_reason: Boolean
+  has_reasoning_efforts: Boolean
+  default_reasoning_effort: String
+  supports_attachments: Boolean
+}
+
+class ModelConfig {
+  /// The model ID as used by the provider API.
+	model: String
+
+  /// The model provider ID that matches a key in the providers config.
+	provider: String
+
+  /// Maximum number of tokens for model responses.
+	max_tokens: Int(1 <= this && this <= 200000)?
+
+  /// Reasoning effort level for OpenAI models that support it.
+	reasoning_effort: "low" | "medium" | "high" | ""?
+	
+  /// Enable thinking mode for Anthropic models that support reasoning.
+  think: Boolean?
+}
+
+/// General application options.
+class Options {
+  /// Paths to files containing context information for the AI.
+  context_paths: Listing<String>?
+
+  /// Directory for storing application data (relative to working directory).
+  data_directory: String? = ".crush"
+
+  /// Enable debug logging.
+  debug: Boolean? = false
+
+  /// Enable debug logging for LSP servers.
+  debug_lsp: Boolean? = false
+
+  /// Disable automatic conversation summarization.
+  disable_auto_summarize: Boolean? = false
+
+  /// Terminal user interface options.
+  tui: TUIOptions?
+}
+
+/// Permission settings for tool usage.
+class Permissions {
+  /// List of tools that don't require permission prompts.
+  allowed_tools: Listing<String>?
+}
+
+class Provider {
+  /// Provider type that determines the API format",
+  type: "openai" | "anthropic" | "gemini" | "azure" | "vertexai" | ""? = openai
+  
+  /// Base URL for the provider's API.
+  base_url: String?
+
+  /// API key for authentication with the provider.
+  api_key: String?
+
+  /// Unique identifier for the provider.
+  id: String?
+
+  /// Human-readable name for the provider
+  name: String?
+
+  /// Whether this provider is disabled.
+  disable: Boolean? = false
+
+  /// Additional HTTP headers to send with requests.
+  extra_headers: String?
+
+  /// Additional fields to include in request bodies.
+  extra_body: String?
+
+  /// Custom prefix to add to system prompts for this provider.
+  system_prompt_prefix: String?
+
+  /// List of models available from this provider.
+  models: Listing<Model>?
+}
+
+class TUIOptions {
+  /// Enable compact mode for the TUI interface.
+  compact_mode: Boolean? = false
+
+  /// Diff mode for the TUI interface.
+  diff_mode: "split" | "unified" | ""?
+}
